@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carbon Footprint Calculator</title>
+<style>
+:root{--bg:#07150d;--sb:#0a1f13;--cd:#10291b;--bd:#1d4630;--pri:#3ddc84;--tx:#e8f5ec;--mut:#8fb5a0;--warn:#f5b73b;--bad:#ef5350}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--tx);display:flex;min-height:100vh}
+aside{width:210px;background:var(--sb);border-right:1px solid var(--bd);padding:16px 10px;position:sticky;top:0;height:100vh;flex-shrink:0}
+.logo{font-weight:700;color:var(--pri);padding:6px 10px 16px;font-size:1.05rem}
+.nav{display:block;width:100%;text-align:left;background:none;border:0;color:var(--tx);padding:10px 12px;border-radius:10px;cursor:pointer;font-size:.95rem;margin-bottom:4px}
+.nav.on,.nav:hover{background:var(--bd);color:var(--pri)}
+main{flex:1;padding:18px;max-width:980px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+h1{margin:0;font-size:1.4rem}h2{margin:0 0 10px;font-size:1.05rem;color:var(--pri)}
+.sub{color:var(--mut);font-size:.85rem}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.kpi .big{font-size:1.7rem;font-weight:700;color:var(--pri)}
+.btn{background:var(--pri);color:#04210f;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer}
+.btn.g{background:var(--bd);color:var(--tx)}
+input,select{width:100%;padding:9px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:.95rem}
+label{display:block;font-size:.8rem;color:var(--mut);margin:8px 0 3px}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tab{background:var(--bg);border:1px solid var(--bd);color:var(--tx);padding:7px 12px;border-radius:20px;cursor:pointer;font-size:.85rem}
+.tab.on{background:var(--pri);color:#04210f;font-weight:700}
+.bar{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:.85rem}.bar>span:first-child{width:90px}
+.bar i{display:block;height:14px;border-radius:7px;background:var(--pri);min-width:2px}
+.trend{display:flex;align-items:flex-end;gap:8px;height:150px}
+.trend div{flex:1;text-align:center;font-size:.7rem;color:var(--mut)}.trend i{display:block;background:var(--pri);border-radius:5px 5px 0 0;margin-bottom:3px}
+.al{border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:.9rem}
+.al.ok{background:#12452a}.al.warn{background:#4a3a0e;color:var(--warn)}.al.bad{background:#4a1616;color:#ff8a80}
+.v{display:none}.v.on{display:block}
+#chat{height:340px;overflow-y:auto;background:var(--bg);border-radius:10px;padding:10px;margin-bottom:10px}
+.m{max-width:85%;padding:8px 12px;border-radius:12px;margin:6px 0;white-space:pre-wrap;font-size:.9rem}
+.m.u{background:var(--pri);color:#04210f;margin-left:auto}.m.a{background:var(--cd);border:1px solid var(--bd)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row input{flex:1;min-width:160px}
+table{width:100%;border-collapse:collapse;font-size:.82rem}td,th{padding:6px;border-bottom:1px solid var(--bd);text-align:left}
+.ck{display:flex;gap:8px;align-items:center;padding:8px 0}.ck input{width:auto}
+@media(max-width:700px){aside{position:fixed;bottom:0;top:auto;height:auto;width:100%;display:flex;overflow-x:auto;z-index:9;border-top:1px solid var(--bd)}.logo{display:none}.nav{white-space:nowrap;width:auto}main{padding-bottom:80px}}
+@media print{aside,.noprint{display:none!important}body{background:#fff;color:#000}.card{border-color:#999;background:#fff}}
+</style></head><body>
+<aside><div class="logo">🌿 Carbon Footprint<br>Calculator</div>
+<button class="nav on" data-v="dash" data-l="Dashboard|Dashboard"></button>
+<button class="nav" data-v="calc" data-l="Calculators|Calculators"></button>
+<button class="nav" data-v="sim" data-l="What-if Simulator|What-if Simulator"></button>
+<button class="nav" data-v="ai" data-l="AI Advisor|AI Advisor"></button>
+<button class="nav" data-v="rep" data-l="Reports|Reports"></button></aside>
+<main>
+<div class="top"><div><h1>Carbon Footprint Calculator</h1><div class="sub" data-l="Know Your Impact. Control Your Carbon. Build a Greener Future.|Apna Impact Jano. Carbon Control Karo. Greener Future Banao."></div></div>
+<button class="btn g" id="lang">Hinglish</button></div>
+
+<section class="v on" id="dash">
+<div class="al" id="alert"></div>
+<div class="grid">
+<div class="card kpi"><div class="sub" data-l="Today (live)|Aaj (live)"></div><div class="big" id="kToday">0</div><div class="sub">kg CO₂e</div></div>
+<div class="card kpi"><div class="sub" data-l="This month (saved)|Is mahine (saved)"></div><div class="big" id="kMonth">0</div><div class="sub">kg CO₂e</div></div>
+<div class="card kpi"><div class="sub" data-l="Budget used|Budget use hua"></div><div class="big" id="kBud">0%</div><div class="sub" id="kRem"></div></div>
+<div class="card kpi"><div class="sub">Green Score</div><div class="big" id="kScore">0</div><div class="sub" id="kTrees"></div></div></div>
+<div class="card"><h2 data-l="Safe limit per person|Ek insaan ki safe limit"></h2>
+<div class="sub" data-l="About 2.3 tonnes CO₂ per year (≈ 6.3 kg/day) by 2030 keeps warming within 1.5°C. It is a fair-share budget, not a perfectly safe amount (UNEP-based estimates).|1.5°C ke liye 2030 tak lagbhag 2.3 tonne CO₂/saal (≈ 6.3 kg/din) honi chahiye. Ye fair-share budget hai, bilkul safe amount nahi (UNEP-based estimates)."></div>
+<label data-l="Monthly carbon budget (kg CO₂e)|Monthly carbon budget (kg CO₂e)"></label><input type="number" id="budget" value="192" min="1"></div>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+<div class="card"><h2 data-l="Emission by category (today)|Category-wise emission (aaj)"></h2><div id="cats"></div></div>
+<div class="card"><h2 data-l="Last 7 saved days (kg)|Pichhle 7 saved din (kg)"></h2><div class="trend" id="trend"></div></div></div>
+<button class="btn" data-go="calc" data-l="Open calculators|Calculators kholo"></button></section>
+
+<section class="v" id="calc"><div class="card"><h2 data-l="Daily carbon calculator|Daily carbon calculator"></h2>
+<div class="tabs" id="tabs"></div><div id="forms"></div>
+<div style="margin-top:14px"><b id="cTot"></b> <button class="btn" id="save" style="margin-left:10px" data-l="Save today's entry|Aaj ki entry save karo"></button></div></div></section>
+
+<section class="v" id="sim"><div class="card"><h2 data-l="What-if Simulator|What-if Simulator"></h2>
+<div class="sub" data-l="Tick a change to see yearly savings based on your calculator values.|Koi change tick karo, calculator ki values ke hisaab se saalana bachat dikhegi."></div>
+<div id="opts"></div><div id="simRes" style="margin-top:12px"></div></div></section>
+
+<section class="v" id="ai"><div class="card"><h2 data-l="AI Carbon Advisor & Eco Chatbot|AI Carbon Advisor & Eco Chatbot"></h2>
+<div id="chat"></div>
+<div class="row"><input id="q"><button class="btn" id="send"></button></div>
+<div class="row" style="margin-top:8px"><button class="btn g" data-q="Analyze my lifestyle and give 5 personalised suggestions|Meri lifestyle analyze karo aur 5 personalised suggestions do" data-l="Analyze lifestyle|Lifestyle analyze karo"></button>
+<button class="btn g" data-q="Write a short carbon footprint report with a reduction goal plan|Ek chhoti carbon footprint report likho aur reduction goal plan do" data-l="AI report|AI report"></button>
+<button class="btn g" data-q="How can I reduce my footprint by 20 percent|Main apna footprint 20 percent kaise kam karun" data-l="Reduce by 20%|20% kaise kam karun"></button></div></div></section>
+
+<section class="v" id="rep"><div class="card"><h2 data-l="Emission history & reports|Emission history & reports"></h2>
+<div class="row noprint" style="margin-bottom:10px"><button class="btn" id="csv">CSV</button><button class="btn g" onclick="print()" data-l="Print / Save PDF|Print / PDF save karo"></button><button class="btn g" id="clr" data-l="Clear history|History clear karo"></button></div>
+<div style="overflow-x:auto"><table id="tbl"></table></div></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let lang="en";const t=s=>{const p=s.split("|");return lang==="hi"&&p[1]?p[1]:p[0]};
+const DIET={vegan:1.5,veg:2.0,nonveg:3.5},TREE=21,LIM=2300;
+// [id,label,default,kg CO2e per unit per day] approximate factors: verify with IPCC/DEFRA/CEA India
+const CFG={
+ "Transport|Transport":[["car","Car (km/day)|Car (km/din)",10,.17],["bike","Bike/scooter (km/day)|Bike (km/din)",0,.07],["bus","Bus (km/day)|Bus (km/din)",0,.09],["metro","Metro (km/day)|Metro (km/din)",5,.03],["train","Train (km/day)|Train (km/din)",0,.04],["flight","Flight (km/month)|Flight (km/mahina)",0,.15/30]],
+ "Electricity|Bijli":[["ac","AC (hours/day)|AC (ghante/din)",1,1.23],["fan","Fan (hours/day)|Fan (ghante/din)",6,.0615],["kwh","Lights, fridge, others (kWh/day)|Light, fridge, baaki (kWh/din)",3,.82]],
+ "Food|Khana":[["diet","sel"],["dairy","Dairy servings/day|Dairy servings/din",1,.7],["pack","Packaged food items/day|Packaged food items/din",1,.3]],
+ "Water|Paani":[["water","Water (litres/day)|Paani (litre/din)",150,.0003]],
+ "Waste|Kachra":[["plastic","Plastic (kg/day)|Plastic (kg/din)",.05,3],["paper","Paper (kg/day)|Paper (kg/din)",.05,1.1],["fw","Food waste (kg/day)|Food waste (kg/din)",.2,.7]],
+ "Shopping|Shopping":[["clo","Clothes (items/month)|Kapde (items/mahina)",2,10/30],["ele","Electronics (items/month)|Electronics (items/mahina)",.2,50/30],["onl","Online orders/month|Online orders/mahina",4,.5/30]],
+ "Digital|Digital":[["stream","Streaming (hours/day)|Streaming (ghante/din)",2,.06],["soc","Browsing/social (hours/day)|Browsing/social (ghante/din)",3,.02],["cloud","Calls/cloud (hours/day)|Calls/cloud (ghante/din)",1,.05]]};
+const KEYS=Object.keys(CFG);let tab=0,hist=[],chat=[];
+try{hist=JSON.parse(localStorage.getItem("cfc")||"[]")}catch(e){}
+const store=()=>{try{localStorage.setItem("cfc",JSON.stringify(hist))}catch(e){}};
+const v=id=>parseFloat($("#i_"+id).value)||0;
+const ids=()=>KEYS.flatMap(k=>CFG[k].map(f=>f[0]));
+
+function build(){
+ $("#tabs").innerHTML=KEYS.map((k,i)=>`<button class="tab" data-t="${i}">${t(k)}</button>`).join("");
+ $("#forms").innerHTML=KEYS.map((k,i)=>`<div class="f" data-s="${i}">`+CFG[k].map(f=>f[1]==="sel"?
+  `<div><label>${t("Diet|Khana")}</label><select id="i_diet"><option value="vegan">Vegan</option><option value="veg" selected>Vegetarian</option><option value="nonveg">Non-veg</option></select></div>`:
+  `<div><label>${t(f[1])}</label><input type="number" min="0" step="any" id="i_${f[0]}" value="${f[2]}"></div>`).join("")+`</div>`).join("");
+ showTab();
+}
+function showTab(){$$(".tab").forEach(b=>b.classList.toggle("on",+b.dataset.t===tab));$$("[data-s]").forEach(d=>d.style.display=+d.dataset.s===tab?"grid":"none")}
+function compute(){const parts={};KEYS.forEach(k=>{parts[k]=CFG[k].reduce((s,f)=>s+(f[1]==="sel"?DIET[$("#i_diet").value]:v(f[0])*f[3]),0)});
+ return{parts,total:Object.values(parts).reduce((a,b)=>a+b,0)}}
+const today=()=>new Date().toISOString().slice(0,10);
+function render(){
+ const c=compute(),budget=parseFloat($("#budget").value)||192,ym=today().slice(0,7);
+ const month=hist.filter(h=>h.d.startsWith(ym)).reduce((s,h)=>s+h.t,0),pct=Math.round(month/budget*100);
+ $("#kToday").textContent=c.total.toFixed(1);$("#kMonth").textContent=month.toFixed(1);$("#kBud").textContent=pct+"%";
+ $("#kRem").textContent=t("Remaining|Bacha hua")+": "+Math.max(0,budget-month).toFixed(1)+" kg";
+ const score=Math.max(0,Math.min(1000,Math.round(1000-c.total/(LIM/365)*500)));$("#kScore").textContent=score;
+ $("#kTrees").textContent="🌳 "+Math.ceil(c.total*365/TREE)+" "+t("trees/year to offset|ped/saal offset ke liye");
+ const a=$("#alert");a.className="al "+(pct>=100?"bad":pct>=80?"warn":"ok");
+ a.textContent=pct>=100?t("Limit exceeded! Your monthly budget is used up.|Limit cross ho gayi! Monthly budget khatam.")
+  :pct>=80?t("Warning: 80% of your monthly budget is used.|Warning: monthly budget ka 80% use ho gaya.")
+  :t("You are within your monthly budget. Keep going!|Aap monthly budget ke andar ho. Aise hi chalte raho!");
+ const mx=Math.max(...Object.values(c.parts),.01);
+ $("#cats").innerHTML=KEYS.map(k=>`<div class="bar"><span>${t(k)}</span><i style="width:${c.parts[k]/mx*55}%"></i><span>${c.parts[k].toFixed(1)} (${Math.round(c.parts[k]/c.total*100)}%)</span></div>`).join("");
+ const last=hist.slice(-7),m2=Math.max(...last.map(h=>h.t),1);
+ $("#trend").innerHTML=last.length?last.map(h=>`<div><i style="height:${h.t/m2*100}px"></i>${h.t.toFixed(0)}<br>${h.d.slice(5)}</div>`).join(""):`<span class="sub">${t("No saved days yet. Save an entry from Calculators.|Abhi koi saved din nahi. Calculators se entry save karo.")}</span>`;
+ $("#cTot").textContent=t("Total|Total")+": "+c.total.toFixed(2)+" kg CO₂e/"+t("day|din")+" ("+(c.total*365/1000).toFixed(2)+" t/"+t("year|saal")+")";
+ $("#tbl").innerHTML="<tr><th>Date</th><th>Total</th>"+KEYS.map(k=>`<th>${t(k)}</th>`).join("")+"</tr>"+hist.slice().reverse().map(h=>`<tr><td>${h.d}</td><td>${h.t.toFixed(2)}</td>`+KEYS.map(k=>`<td>${(h.p[k]||0).toFixed(2)}</td>`).join("")+"</tr>").join("");
+ sim();
+}
+function sim(){
+ const c=compute(),d=$("#i_diet").value;
+ const O=[["metro","Car → Metro|Car → Metro",v("car")*(.17-.03)],["led","Regular → LED lights|Normal → LED lights",c.parts["Electricity|Bijli"]*.1],["veg","Meat → Veg diet|Non-veg → Veg khana",d==="nonveg"?1.5:d==="veg"?.5:0],["reuse","Plastic → Reusable|Plastic → Reusable",v("plastic")*3*.6]];
+ const on=$$("#opts input:checked").map(x=>x.value);
+ if(!$("#opts").children.length)$("#opts").innerHTML=O.map(o=>`<label class="ck"><input type="checkbox" value="${o[0]}"><span data-l="${o[1]}"></span></label>`).join("");
+ $$("#opts [data-l]").forEach(e=>e.textContent=t(e.dataset.l));
+ const s=O.filter(o=>on.includes(o[0])).reduce((a,o)=>a+o[2],0),y=c.total*365,ny=(c.total-s)*365;
+ $("#simRes").innerHTML=`<div class="grid"><div class="card kpi"><div class="sub">${t("Current|Abhi")}</div><div class="big">${y.toFixed(0)}</div><div class="sub">kg/${t("year|saal")}</div></div><div class="card kpi"><div class="sub">${t("After change|Change ke baad")}</div><div class="big">${ny.toFixed(0)}</div><div class="sub">kg/${t("year|saal")}</div></div><div class="card kpi"><div class="sub">${t("You save|Aapki bachat")}</div><div class="big">${(s*365).toFixed(0)} kg</div><div class="sub">≈ ${(s/c.total*100||0).toFixed(0)}%</div></div></div>`;
+}
+function summary(){const c=compute();return`Daily ${c.total.toFixed(1)} kg CO2e (${(c.total*365/1000).toFixed(2)} t/yr, safe limit 2.3 t/yr). By category: `+KEYS.map(k=>k.split("|")[0]+" "+c.parts[k].toFixed(1)).join(", ")+`. Diet: ${$("#i_diet").value}. Car ${v("car")} km/day.`}
+function fallback(){const c=compute(),top=KEYS.slice().sort((a,b)=>c.parts[b]-c.parts[a])[0].split("|")[0];
+ const tips={Transport:"Use metro or bus instead of the car for regular trips; walk or cycle for short ones.",Electricity:"Set AC to 24-26°C, use LED lights and 5-star appliances.",Food:"Try 2-3 vegetarian days a week and avoid food waste.",Water:"Fix leaks and use a bucket instead of a shower.",Waste:"Carry a reusable bag and bottle; segregate and recycle waste.",Shopping:"Buy less, buy durable, and avoid fast fashion.",Digital:"Lower video quality and turn off unused cloud syncing."};
+ return t("(Offline tips) Your biggest source is |(Offline tips) Aapka sabse bada source hai ")+top+". "+tips[top]}
+function msg(c,x){const d=document.createElement("div");d.className="m "+c;d.textContent=x;$("#chat").appendChild(d);$("#chat").scrollTop=1e9;return d}
+async function ask(x){
+ if(!x.trim())return;msg("u",x);chat.push({role:"user",content:x});$("#q").value="";
+ const w=msg("a","...");let r;
+ try{const res=await fetch("/api/chat",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({messages:chat.slice(-8),summary:summary(),lang})});
+  if(!res.ok)throw 0;r=(await res.json()).reply;if(!r)throw 0}catch(e){r=fallback()}
+ w.textContent=r;chat.push({role:"assistant",content:r});$("#chat").scrollTop=1e9}
+function go(n){$$(".v").forEach(s=>s.classList.toggle("on",s.id===n));$$(".nav").forEach(b=>b.classList.toggle("on",b.dataset.v===n))}
+function lbl(){$$("[data-l]").forEach(e=>e.textContent=t(e.dataset.l));$("#lang").textContent=lang==="en"?"Hinglish":"English";
+ $("#q").placeholder=t("Ask about your carbon footprint...|Apne carbon footprint ke baare mein poochho...");$("#send").textContent=t("Send|Bhejo");document.documentElement.lang=lang==="hi"?"hi":"en"}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.v)go(b.dataset.v);if(b.dataset.go)go(b.dataset.go);if(b.classList.contains("tab")){tab=+b.dataset.t;showTab()}
+ if(b.dataset.q)ask(b.dataset.q.split("|")[lang==="hi"?1:0])});
+document.addEventListener("input",render);
+$("#lang").onclick=()=>{lang=lang==="en"?"hi":"en";const s=ids().map(i=>$("#i_"+i).value);build();ids().forEach((i,j)=>{$("#i_"+i).value=s[j]});lbl();render()};
+$("#save").onclick=()=>{const c=compute(),d=today();hist=hist.filter(h=>h.d!==d);hist.push({d,t:c.total,p:Object.fromEntries(KEYS.map(k=>[k,c.parts[k]]))});hist.sort((a,b)=>a.d<b.d?-1:1);store();render();go("dash")};
+$("#send").onclick=()=>ask($("#q").value);$("#q").onkeydown=e=>{if(e.key==="Enter")ask($("#q").value)};
+$("#clr").onclick=()=>{hist=[];store();render()};
+$("#csv").onclick=()=>{const rows=[["date","total_kg",...KEYS.map(k=>k.split("|")[0])],...hist.map(h=>[h.d,h.t.toFixed(2),...KEYS.map(k=>(h.p[k]||0).toFixed(2))])];
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(",")).join("\n")],{type:"text/csv"}));a.download="carbon-history.csv";a.click()};
+build();lbl();render();msg("a","Hi! I am your Carbon Footprint AI. Ask me anything about your emissions. / Namaste! Main aapka Carbon Footprint AI hoon.");
+</script></body></html>
